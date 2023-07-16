@@ -1,12 +1,55 @@
-import UserForm from "./UserForm";
-import AddressForm from "./AddressForm";
-import AccountForm from "./AccountForm";
+import { useState } from "react";
 
-import useMultistepForm from "./useMultistepForm";
+import UserForm from "./components/UserForm";
+import AddressForm from "./components/AddressForm";
+import AccountForm from "./components/AccountForm";
+
+import useMultistepForm from "./hooks/useMultistepForm";
+
+type FormData = {
+  firstName: string;
+  lastName: string;
+  age: string;
+  street: string;
+  city: string;
+  state: string;
+  zip: string;
+  email: string;
+  password: string;
+};
+
+const INITIAL_DATA: FormData = {
+  firstName: "",
+  lastName: "",
+  age: "",
+  street: "",
+  city: "",
+  state: "",
+  zip: "",
+  email: "",
+  password: "",
+};
 
 function App() {
+  const [data, setData] = useState(INITIAL_DATA);
+
+  function updateFields(fields: Partial<FormData>) {
+    setData((prevState) => {
+      return { ...prevState, ...fields };
+    });
+  }
+  
   const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
-    useMultistepForm([<UserForm />, <AddressForm />, <AccountForm />]);
+    useMultistepForm([
+      <UserForm {...data} updateFields={updateFields} />,
+      <AddressForm {...data} updateFields={updateFields} />,
+      <AccountForm {...data} updateFields={updateFields} />,
+    ]);
+
+  const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    next();
+  };
 
   return (
     <div
@@ -20,7 +63,7 @@ function App() {
         fontFamily: "Arial",
       }}
     >
-      <form>
+      <form onSubmit={submitHandler}>
         <div
           style={{
             position: "absolute",
@@ -41,15 +84,9 @@ function App() {
             justifyContent: "end",
           }}
         >
-          {!isFirstStep && (
-            <button type="button" onClick={back}>
-              Back
-            </button>
-          )}
+          {!isFirstStep && <button onClick={back}>Back</button>}
 
-          <button type="button" onClick={next}>
-            {isLastStep ? "Finish" : "Next"}
-          </button>
+          <button type="submit">{isLastStep ? "Finish" : "Next"}</button>
         </div>
       </form>
     </div>
