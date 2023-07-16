@@ -38,7 +38,7 @@ function App() {
       return { ...prevState, ...fields };
     });
   }
-  
+
   const { steps, currentStepIndex, step, isFirstStep, isLastStep, back, next } =
     useMultistepForm([
       <UserForm {...data} updateFields={updateFields} />,
@@ -48,7 +48,8 @@ function App() {
 
   const submitHandler = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    next();
+    if (!isLastStep) return next();
+    alert("Successful Account Creation");
   };
 
   return (
@@ -61,6 +62,7 @@ function App() {
         padding: "2rem",
         margin: "1rem",
         fontFamily: "Arial",
+        maxWidth: "max-content",
       }}
     >
       <form onSubmit={submitHandler}>
@@ -84,7 +86,11 @@ function App() {
             justifyContent: "end",
           }}
         >
-          {!isFirstStep && <button onClick={back}>Back</button>}
+          {!isFirstStep && (
+            <button type="button" onClick={back}>
+              Back
+            </button>
+          )}
 
           <button type="submit">{isLastStep ? "Finish" : "Next"}</button>
         </div>
